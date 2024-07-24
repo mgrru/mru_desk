@@ -1,36 +1,43 @@
-use std::fs::read;
+use eframe::egui::{Context, FontDefinitions};
 
-use eframe::{
-    egui::{Context, FontData, FontDefinitions},
-    epaint::FontFamily,
-};
-use font_kit::{family_name::FamilyName, handle::Handle, properties::Properties, source::SystemSource};
-
-pub(super) fn load_font(ctx: &Context){
+pub(super) fn load_font(ctx: &Context) {
     let mut fonts = FontDefinitions::default();
 
-    let handle = SystemSource::new()
-        .select_best_match(&[FamilyName::SansSerif], &Properties::new())
-        .unwrap();
+    let font_name = "envy_code_r_nerd_mono";
+    let font_name2 = "chinese_font";
 
-    let buf = match handle {
-        Handle::Memory { bytes, .. } => bytes.to_vec(),
-        Handle::Path { path, .. }=>read(path).unwrap(),
-    };
-
-    const FONT_SYSTEM_SANS_SERIF:&str = "System Sans Serif";
+    fonts.font_data.insert(
+        font_name2.to_string(),
+        egui::FontData::from_static(include_bytes!("font/文泉驿正黑.ttc")),
+    );
+    fonts.font_data.insert(
+        font_name.to_string(),
+        egui::FontData::from_static(include_bytes!(
+            "font/envycoder/EnvyCodeRNerdFontMono-Regular.ttf"
+        )),
+    );
 
     fonts
-        .font_data
-        .insert(FONT_SYSTEM_SANS_SERIF.to_owned(), FontData::from_owned(buf));
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .insert(0, font_name2.to_string());
+    fonts
+        .families
+        .entry(egui::FontFamily::Proportional)
+        .or_default()
+        .insert(0, font_name.to_string());
 
-    if let Some(vec) = fonts.families.get_mut(&FontFamily::Proportional) {
-        vec.push(FONT_SYSTEM_SANS_SERIF.to_owned());
-    }
-
-    if let Some(vec) = fonts.families.get_mut(&FontFamily::Monospace) {
-        vec.push(FONT_SYSTEM_SANS_SERIF.to_owned());
-    }
+    fonts
+        .families
+        .entry(egui::FontFamily::Monospace)
+        .or_default()
+        .push(font_name2.to_string());
+    fonts
+        .families
+        .entry(egui::FontFamily::Monospace)
+        .or_default()
+        .push(font_name.to_string());
 
     ctx.set_fonts(fonts);
 }

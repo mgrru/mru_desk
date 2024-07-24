@@ -7,4 +7,4 @@ edition = "2021"
 egui = "0.28.1"
 eframe = "0.28.1"
 font-kit = "0.14.1"
-egui_extras = "0.28.1"
+egui_extras = { version = "0.28.1", features = ["all_loaders"] }
